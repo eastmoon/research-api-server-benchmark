@@ -1,0 +1,38 @@
+Step1:
+  module: default
+  container:
+    name: isa
+  command:
+  - cmd: exec
+    msg: Remove legacy statistics and report.
+    data: bash clean-legacy-statistics.sh
+  - cmd: exec
+    msg: Start watch docker resource usage statistics.
+    data: bash watch-docker-resource.sh enable
+Step2:
+  module: default
+  container:
+    name: tester
+  command:
+  - cmd: exec
+    msg: Execute 6 user, 1 seconds, 60 times
+    data: bash api-k6-numeric.sh --vue=6 --duration=1s --times=60
+Step3:
+  module: default
+  container:
+    name: isa
+  command:
+  - cmd: exec
+    msg: Stop watch docker resource usage statistics.
+    data: bash watch-docker-resource.sh disable
+Step4:
+  module: default
+  container:
+    name: isa
+  command:
+  - cmd: exec
+    msg: Statistics benchmark report file.
+    data: python statistics-benchmark-report.py --duration=1s
+  - cmd: exec
+    msg: drawing benchmark image.
+    data: python statistics-benchmark-graph.py --duration=1s

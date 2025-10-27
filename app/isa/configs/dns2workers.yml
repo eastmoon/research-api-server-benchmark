@@ -1,0 +1,44 @@
+Step1:
+  module: default
+  container:
+    name: isa
+  command:
+  - cmd: exec
+    msg: Remove legacy statistics and report.
+    data: bash clean-legacy-statistics.sh
+  - cmd: exec
+    msg: Start watch docker resource usage statistics.
+    data: bash watch-docker-resource.sh enable
+Step2:
+  module: default
+  container:
+    name: tester
+  command:
+  - cmd: exec
+    msg: Execute k6 server status testing.
+    data: bash api-k6-server-status.sh --server=workers
+  - cmd: exec
+    msg: Execute k6 numeric addition testing.
+    data: bash api-k6-numeric.sh --server=workers
+  - cmd: exec
+    msg: Execute k6 string replace testing.
+    data: bash api-k6-string.sh --server=workers
+Step3:
+  module: default
+  container:
+    name: isa
+  command:
+  - cmd: exec
+    msg: Stop watch docker resource usage statistics.
+    data: bash watch-docker-resource.sh disable
+Step4:
+  module: default
+  container:
+    name: isa
+  command:
+  - cmd: exec
+    msg: Statistics benchmark report file.
+    data: python statistics-benchmark-report.py
+  - cmd: exec
+    msg: drawing benchmark image.
+    data: python statistics-benchmark-graph.py
